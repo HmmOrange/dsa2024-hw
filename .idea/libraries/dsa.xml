@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="dsa">
+    <CLASSES>
+      <root url="file://$USER_HOME$/Documents/dsa" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$USER_HOME$/Documents/dsa" />
+    </SOURCES>
+    <jarDirectory url="file://$USER_HOME$/Documents/dsa" recursive="false" />
+    <jarDirectory url="file://$USER_HOME$/Documents/dsa" recursive="false" type="SOURCES" />
+  </library>
+</component>
