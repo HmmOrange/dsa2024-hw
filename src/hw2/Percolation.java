@@ -57,7 +57,7 @@ public class Percolation {
         tryUnion(row, col, row, col + 1);
         tryUnion(row, col, row, col - 1);
 
-        // Connect top and bottom row sites to virtual site 0
+        // Connect top and bottom row sites to virtual sites 0 and n * n + 1
         if (row == 1) {
             uf.union(0, map2DTo1D(row, col, gridSize));
             ufNoBottom.union(0, map2DTo1D(row, col, gridSize));
