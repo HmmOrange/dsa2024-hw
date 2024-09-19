@@ -1,58 +1,69 @@
-package hw2;
+// package hw2;
 
-import edu.princeton.cs.algs4.StdRandom;
-import edu.princeton.cs.algs4.StdStats;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
-
 public class Percolation {
-    private final int[][] grid;
-    private int gridSize = n;
+    private final boolean[][] grid;
+    private final int gridSize;
     private int openSiteCount = 0;
-    private int[] hx = {1, -1, 0, 0};
-    private int[] hy = {0, 0, 1, -1};
-    private WeightedQuickUnionUF uf;
+    private final WeightedQuickUnionUF uf;
+    private final WeightedQuickUnionUF ufNoBottom;
     public Percolation(int n) {
         if (n <= 0) {
             throw new IllegalArgumentException();
         }
         gridSize = n;
 
-        grid = new int[n][n]; // 0 = open, 1 = close
-        for (int i = 1; i <= n; i++) {
-            for (int j = 1; j <= n; j++) {
-                grid[i][j] = 1;
+        grid = new boolean[n][n]; // true = open, false = close
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                grid[i][j] = false;
             }
         }
 
         uf = new WeightedQuickUnionUF(n * n + 2);
+        ufNoBottom = new WeightedQuickUnionUF(n * n + 1); // without
+    }
+    // Helper functions
+    private boolean valid(int row, int col, int size) {
+        return 1 <= row && row <= size && 1 <= col && col <= size;
     }
 
+    private int map2DTo1D(int row, int col, int size) {
+        return size * (row - 1) + col;
+    }
+
+    private void tryUnion(int row, int col, int adjRow, int adjCol) {
+        if (valid(adjRow, adjCol, gridSize) && isOpen(adjRow, adjCol)) {
+            uf.union(map2DTo1D(row, col, gridSize), map2DTo1D(adjRow, adjCol, gridSize));
+            ufNoBottom.union(map2DTo1D(row, col, gridSize), map2DTo1D(adjRow, adjCol, gridSize));
+        }
+    }
+
+    // Main API
     public void open(int row, int col) {
-        if (1 > row || row > gridSize || 1 > col || col > gridSize) {
+        if (!valid(row, col, gridSize)) {
             throw new IllegalArgumentException();
         }
 
-        grid[row][col] = 0;
+        if (isOpen(row, col)) return;
+
+        grid[row - 1][col - 1] = true;
         openSiteCount++;
 
         // Connect open sites in UF
-        for (int i = 0; i < 4; i++) {
-            int fx = row + hx[i];
-            int fy = col + hy[i];
+        tryUnion(row, col, row - 1, col);
+        tryUnion(row, col, row + 1, col);
+        tryUnion(row, col, row, col + 1);
+        tryUnion(row, col, row, col - 1);
 
-            if (1 <= fx && fx <= gridSize && 1 <= fy && fy <= gridSize && isOpen(fx, fy)) {
-                uf.union(gridSize * (row - 1) + col, gridSize * (fx - 1) + fy);
-            }
-        }
-
-        // Connect top and bottom row sites to 2 virtual sites 0 and n*n + 1
+        // Connect top and bottom row sites to virtual site 0
         if (row == 1) {
-            uf.union(0, col);
+            uf.union(0, map2DTo1D(row, col, gridSize));
+            ufNoBottom.union(0, map2DTo1D(row, col, gridSize));
         }
-
         if (row == gridSize) {
-            uf.union(gridSize * (row - 1) + col, gridSize * gridSize + 1);
+            uf.union(gridSize * gridSize + 1, map2DTo1D(row, col, gridSize));
         }
     }
 
@@ -61,7 +72,7 @@ public class Percolation {
             throw new IllegalArgumentException();
         }
 
-        return grid[row][col] == 0;
+        return grid[row - 1][col - 1];
     }
 
     public boolean isFull(int row, int col) {
@@ -69,7 +80,7 @@ public class Percolation {
             throw new IllegalArgumentException();
         }
 
-        return grid[row][col] == 1;
+        return isOpen(row, col) && ufNoBottom.find(map2DTo1D(row, col, gridSize)) == ufNoBottom.find(0);
     }
 
     public int numberOfOpenSites() {

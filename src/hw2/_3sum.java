@@ -18,7 +18,7 @@ public class _3sum {
 
             int sum = -a.get(i);
             int l = 0, r = a.size() - 1;
-            while (l < i && i <
+            while (l < i && i < r) {
                 if (a.get(l) + a.get(r) < sum) l++;
                 else if (a.get(l) + a.get(r) > sum) r--;
                 else {
