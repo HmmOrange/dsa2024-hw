@@ -15,11 +15,6 @@ public class Percolation {
         gridSize = n;
 
         grid = new boolean[n][n]; // true = open, false = close
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                grid[i][j] = false;
-            }
-        }
 
         uf = new WeightedQuickUnionUF(n * n + 2);
         ufNoBottom = new WeightedQuickUnionUF(n * n + 1); // without
@@ -68,7 +63,7 @@ public class Percolation {
     }
 
     public boolean isOpen(int row, int col) {
-        if (1 > row || row > gridSize || 1 > col || col > gridSize) {
+        if (!valid(row, col, gridSize)) {
             throw new IllegalArgumentException();
         }
 
@@ -76,7 +71,7 @@ public class Percolation {
     }
 
     public boolean isFull(int row, int col) {
-        if (1 > row || row > gridSize || 1 > col || col > gridSize) {
+        if (!valid(row, col, gridSize)) {
             throw new IllegalArgumentException();
         }
 
